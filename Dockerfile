@@ -48,17 +48,18 @@ ENV TZ Asia/Kuala_Lumpur
 
 # install some libraries
 WORKDIR /tmp
-# install miniconda3 to use jupyter notebook and jupyter lab
-USER user
+# install miniconda3 to use jupyter notebook
+ENV PATH /opt/conda/bin:$PATH
+
+# based on: https://hub.docker.com/r/continuumio/anaconda3/dockerfile
 RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
-    /bin/bash ~/miniconda.sh -b -p $HOME/conda && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
     rm ~/miniconda.sh && \
-    $HOME/conda/bin/conda clean -tipsy && \
-    sudo ln -s $HOME/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
-    echo ". $HOME/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    /opt/conda/bin/conda clean -tipsy && \
+    sudo ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc && \
-    $HOME/conda/bin/conda install -y jupyter && \
-    $HOME/conda/bin/conda install -c conda-forge jupyerlab
+    /opt/conda/bin/conda install -y jupyter
 
 # install some r libraries
 RUN echo "install.packages(\"rstan\", repos=\"https://cloud.r-project.org/\", dependencies = TRUE, Ncpus=8)" | R --vanilla
