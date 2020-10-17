@@ -48,6 +48,11 @@ ENV TZ Asia/Kuala_Lumpur
 
 # install some libraries
 WORKDIR /tmp
+
+# install some R libraries
+COPY ./scripts/install_libraries.R .
+RUN Rscript  install_libraries.R
+
 # install miniconda3 to use jupyter notebook
 ENV PATH /opt/conda/bin:$PATH
 
@@ -61,10 +66,10 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     echo "conda activate base" >> ~/.bashrc && \
     /opt/conda/bin/conda install -y jupyter
 
-# install some r libraries
-RUN echo "install.packages(\"rstan\", repos=\"https://cloud.r-project.org/\", dependencies = TRUE, Ncpus=8)" | R --vanilla
-COPY ./scripts/install_libraries.R .
-RUN Rscript --vanilla install_libraries.R
+USER user
+
+# install the R kernel for user "user"
+RUN echo "IRkernel::installspec()" | R --vanilla
 
 # for installing RCall in Julia
 ENV R_HOME  /usr/lib/R
